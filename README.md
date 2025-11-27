@@ -11,19 +11,19 @@ Dockerfile
 .github/workflows/main.yml
 
 **API Endpoints**
-1. Root Endpoint
+**1. Root Endpoint**
 Route: /
 Method: GET
 Description: Health check endpoint to verify the API is functioning correctly.
 
 Response:
+    
+    {
+      "status": "ok",
+      "version": "1.0.0"
+    }
 
-{
-  "status": "ok",
-  "version": "1.0.0"
-}
-
-2. Addition Endpoint
+**2. Addition Endpoint**
 Route: /add/<int:a>/<int:b>
 Method: GET
 Description: Performs an addition operation using two integer path parameters.
@@ -32,150 +32,124 @@ Example Request:
 /add/5/10
 
 Response:
-
-{
-  "result": 15
-}
-
+    
+    {
+      "result": 15
+    }
 
 If non-integer parameters are provided, Flask automatically returns status code 404 because of the <int:> type converter.
 
-3. Login Endpoint
-
+**3. Login Endpoint**
 Route: /login
 Method: POST
 Description: Authenticates a user using a temporary in-memory dictionary that simulates a database.
 If the credentials are valid, the logged-in username is stored in the Flask session.
 
-Temporary User Database:
+    **Temporary User Database:**
 
-USERS = {
-    "alice": "password123",
-    "admin": "admin456"
-}
-
-
-Valid Request Body:
-
-{
-  "username": "alice",
-  "password": "password123"
-}
+    USERS = {
+        "alice": "password123",
+        "admin": "admin456"
+    }
 
 
-Successful Response:
+    **Valid Request Body:**
 
-{
-  "message": "Login successful",
-  "user": "alice"
-}
+    {
+      "username": "alice",
+      "password": "password123"
+    }
 
 
-Invalid Credentials Response:
+    **Successful Response:**
+    
+    {
+      "message": "Login successful",
+      "user": "alice"
+    }
+    
+    **Invalid Credentials Response:**
+    
+    {
+      "detail": "Invalid credentials"
+    }
 
-{
-  "detail": "Invalid credentials"
-}
 
-4. Protected Subtraction Endpoint
-
+**4. Protected Subtraction Endpoint**
 Route: /subtract/<int:a>/<int:b>
 Method: GET
 Description: Performs subtraction, but only if the user is authenticated.
 The endpoint checks for an active session created by the login endpoint.
 
-Unauthenticated Response:
+    **Unauthenticated Response:**
+    
+    {
+      "detail": "Authentication required"
+    }
+    
+    
+    **Authenticated Response Example:**
+    
+    {
+      "result": 7
+    }
 
-{
-  "detail": "Authentication required"
-}
-
-
-Authenticated Response Example:
-
-{
-  "result": 7
-}
-
-Unit Testing (test.py)
-
+**Unit Testing (test.py)**
 The test.py file contains a complete set of tests written using pytest.
 All tests are automatically executed during the CI pipeline.
 
 The tests cover:
+1. Root endpoint validation
+2. Addition endpoint (valid and invalid input)
+3. Login endpoint
+  - Valid login
+  - Invalid login
+4. Subtract endpoint
+  - Fails without login
+  - Succeeds after login
 
-Root endpoint validation
-
-Addition endpoint (valid and invalid input)
-
-Login endpoint
-
-Valid login
-
-Invalid login
-
-Subtract endpoint
-
-Fails without login
-
-Succeeds after login
-
-Example: Valid Login Test
-def test_login_valid_credentials(client):
-    payload = {"username": "alice", "password": "password123"}
-    response = client.post("/login", json=payload)
-    assert response.status_code == 200
-    assert response.get_json()["user"] == "alice"
-
-Example: Subtraction After Login Test
-def test_subtract_after_login(client):
-    login_payload = {"username": "alice", "password": "password123"}
-    client.post("/login", json=login_payload)
-
-    response = client.get("/subtract/10/3")
-    assert response.status_code == 200
-    assert response.get_json() == {"result": 7}
-
+    **Example: Valid Login Test**
+    def test_login_valid_credentials(client):
+        payload = {"username": "alice", "password": "password123"}
+        response = client.post("/login", json=payload)
+        assert response.status_code == 200
+        assert response.get_json()["user"] == "alice"
+    
+    **Example: Subtraction After Login Test**
+    def test_subtract_after_login(client):
+        login_payload = {"username": "alice", "password": "password123"}
+        client.post("/login", json=login_payload)
+    
+        response = client.get("/subtract/10/3")
+        assert response.status_code == 200
+        assert response.get_json() == {"result": 7}
 
 All tests must pass before deployment simulation proceeds.
 
-CI/CD Pipeline Overview
 
+**CI/CD Pipeline Overview**
 The CI/CD pipeline is implemented in .github/workflows/main.yml.
 The pipeline includes two stages: Integration (CI) and Delivery (CD).
 
-Integration Stage (CI)
-
+**Integration Stage (CI)**
 Triggered on every push or pull request to the main branch.
 
 The CI stage performs:
+1. Code checkout
+2. Python setup
+3. Dependency installation
+4. Linting using Flake8
+5. Automated testing using PyTest
+6. The workflow stops immediately if any step fails.
 
-Code checkout
-
-Python setup
-
-Dependency installation
-
-Linting using Flake8
-
-Automated testing using PyTest
-
-The workflow stops immediately if any step fails.
-
-Delivery Stage (CD)
-
+**Delivery Stage (CD)**
 This stage only runs when:
-
-The CI stage succeeds
-
-The event is a push to the main branch
+- The CI stage succeeds
+- The event is a push to the main branch
 
 The CD stage performs:
-
-Docker setup and build
-
-Simulated deployment steps (container build confirmation, registry push simulation, and orchestration update message)
-
+1. Docker setup and build
+2. Simulated deployment steps (container build confirmation, registry push simulation, and orchestration update message)
 This stage does not deploy to a real environment; it demonstrates understanding of the deployment workflow.
 
 **Dockerfile**
@@ -191,7 +165,7 @@ Build Command
   docker build -t week14-app .
 
 Run Command
-  docker run -p 8000:8080 week14-app
+  docker run -p 8000:8090 week14-app
 
 **How to Run Locally**
 
