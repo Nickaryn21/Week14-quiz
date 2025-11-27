@@ -4,11 +4,11 @@ This project implements a simple Flask-based API with mathematical operations, a
 This assignment demonstrates the ability to build backend API functions, secure endpoints, write automated tests, and integrate continuous integration and delivery in a modern development workflow.
 
 **Project Structure**
-main.py
-test.py
-requirements.txt
-Dockerfile
-.github/workflows/main.yml
+- main.py
+- test.py
+- requirements.txt
+- Dockerfile
+- .github/workflows/main.yml
 
 **API Endpoints**
 **1. Root Endpoint**
